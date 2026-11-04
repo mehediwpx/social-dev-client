@@ -1,0 +1,7 @@
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+[Image 1] clone this homepage section in 4 components(gallary,newsltter,footer-top,footer-bottom)/
+
+git add .
+git commit -m "first commit"
+git branch -M main
+git push -u origin main
