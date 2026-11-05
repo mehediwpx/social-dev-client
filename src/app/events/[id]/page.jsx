@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import EditEvent from "@/components/edit-event";
+import DeleteEvent from "@/components/delete-event";
 
 const EventDetailsPage = async ({ params }) => {
   const { id } = await params;
@@ -194,14 +195,7 @@ const EventDetailsPage = async ({ params }) => {
               </Button>
 
               <EditEvent event={event}></EditEvent>
-
-              <Button
-                variant="outline"
-                className="w-full sm:w-auto h-12 px-6 border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl transition flex items-center justify-center gap-2"
-              >
-                <Share2 className="w-4 h-4 text-slate-500" />
-                Share
-              </Button>
+              <DeleteEvent event={event}></DeleteEvent>
             </div>
           </CardContent>
         </Card>
