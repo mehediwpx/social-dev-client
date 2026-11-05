@@ -1,10 +1,45 @@
+"use client";
+import React from "react";
 import Link from "next/link";
-import { CalendarDays, HandHeart, Home } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  CalendarDays,
+  HandHeart,
+  Home,
+  LogOut,
+  Settings,
+  User,
+} from "lucide-react";
 import { cn } from "cn";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+
+// Import your auth client instances
+import { authClient } from "@/lib/auth-client";
+const { useSession, signOut } = authClient;
 
 export function Navbar() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  const handleSignOut = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/"); // Redirect user to home page on successful logout
+          router.refresh(); // Refresh state across server/client components
+        },
+      },
+    });
+  };
+
   return (
     <header className="relative z-20 w-full bg-white">
       <div className="mx-auto flex h-20 max-w-[1440px] items-center gap-6 px-6 sm:h-[88px] sm:px-10 lg:px-16">
@@ -62,24 +97,80 @@ export function Navbar() {
           </Link>
         </nav>
 
-        <Link
-          href="/login"
-          className={cn(
-            buttonVariants({ size: "lg" }),
-            "ml-auto h-11 shrink-0 rounded-lg border-transparent bg-brand px-7 text-sm font-semibold text-white hover:bg-brand/90 lg:ml-0",
-          )}
-        >
-          Login
-        </Link>
-        <Link
-          href="/signup"
-          className={cn(
-            buttonVariants({ size: "lg" }),
-            "ml-auto h-11 shrink-0 rounded-lg border-transparent bg-brand px-7 text-sm font-semibold text-white hover:bg-brand/90 lg:ml-0",
-          )}
-        >
-          Sign Up
-        </Link>
+        {user ? (
+          <Popover>
+            <PopoverTrigger className="cursor-pointer rounded-full outline-none transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-brand">
+              <Avatar>
+                <AvatarImage
+                  src={user.image || "https://github.com"}
+                  alt={user.name}
+                />
+                <AvatarFallback>
+                  {user.name?.slice(0, 2).toUpperCase() || "US"}
+                </AvatarFallback>
+              </Avatar>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-64 p-4" align="end" sideOffset={8}>
+              <div className="flex flex-col space-y-1 pb-2">
+                <p className="text-sm font-semibold text-foreground">
+                  {user.name}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {user.email}
+                </p>
+              </div>
+              <Separator className="my-2" />
+
+              <div className="flex flex-col space-y-1">
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  <User className="size-4 text-muted-foreground" />
+                  Profile
+                </Link>
+                <Link
+                  href="/profile/settings"
+                  className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  <Settings className="size-4 text-muted-foreground" />
+                  Settings
+                </Link>
+              </div>
+              <Separator className="my-2" />
+
+              <button
+                onClick={handleSignOut}
+                className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 cursor-pointer"
+              >
+                <LogOut className="size-4" />
+                Sign out
+              </button>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "ml-auto h-11 shrink-0 rounded-lg border-transparent bg-brand px-7 text-sm font-semibold text-white hover:bg-brand/90 lg:ml-0",
+              )}
+            >
+              Login
+            </Link>
+            <Link
+              href="/signup"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "ml-auto h-11 shrink-0 rounded-lg border-transparent bg-brand px-7 text-sm font-semibold text-white hover:bg-brand/90 lg:ml-0",
+              )}
+            >
+              Sign Up
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );
