@@ -71,6 +71,15 @@ export function Navbar() {
         >
           Login
         </Link>
+        <Link
+          href="/signup"
+          className={cn(
+            buttonVariants({ size: "lg" }),
+            "ml-auto h-11 shrink-0 rounded-lg border-transparent bg-brand px-7 text-sm font-semibold text-white hover:bg-brand/90 lg:ml-0",
+          )}
+        >
+          Sign Up
+        </Link>
       </div>
     </header>
   );
