@@ -7,7 +7,6 @@ import {
   MapPin,
   Building2,
   ArrowLeft,
-  CheckCircle2,
   Share2,
   Edit,
 } from "lucide-react";
@@ -16,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import EditEvent from "@/components/edit-event";
 import DeleteEvent from "@/components/delete-event";
+import JoinEvent from "@/components/join-event";
 
 const EventDetailsPage = async ({ params }) => {
   const { id } = await params;
@@ -65,16 +65,13 @@ const EventDetailsPage = async ({ params }) => {
         {/* Navigation Back Button */}
         <div>
           <Button
-            asChild
+            render={<Link href="/events" />}
             variant="ghost"
             className="text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 transition"
           >
-            <Link
-              href="/events"
-              className="inline-flex items-center gap-2 text-sm font-semibold"
-            >
+            <span className="inline-flex items-center gap-2 text-sm font-semibold">
               <ArrowLeft className="w-4 h-4" /> Back to Events
-            </Link>
+            </span>
           </Button>
         </div>
 
@@ -189,10 +186,7 @@ const EventDetailsPage = async ({ params }) => {
 
             {/* Action Buttons */}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-4">
-              <Button className="w-full sm:flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                <CheckCircle2 className="w-5 h-5" />
-                Join Event
-              </Button>
+              <JoinEvent event={event} />
 
               <EditEvent event={event}></EditEvent>
               <DeleteEvent event={event}></DeleteEvent>

@@ -17,6 +17,10 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { authClient } from "@/lib/auth-client";
+import { getAuthHeaders } from "@/lib/session";
+
+const { useSession } = authClient;
 
 const initialForm = {
   title: "",
@@ -49,6 +53,7 @@ function FieldLabel({ children, htmlFor, className }) {
 }
 
 export default function AddEventPage() {
+  const { data: session } = useSession();
   const [form, setForm] = useState(initialForm);
   const [brokenCoverUrl, setBrokenCoverUrl] = useState(null);
   const [submitted, setSubmitted] = useState(false);
@@ -63,13 +68,26 @@ export default function AddEventPage() {
   async function handleSubmit(event) {
     event.preventDefault();
 
+    if (!session?.user?.email) {
+      alert("You must be logged in to create an event.");
+      return;
+    }
+
     try {
+      // Protected API: sends the user's JWT (see src/lib/session.js). The
+      // server derives `createdBy` from the verified token.
+      const authHeaders = await getAuthHeaders();
       const res = await fetch("http://localhost:5000/add-event", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...authHeaders,
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          createdBy: session.user.email,
+          joinedUsers: [],
+        }),
       });
 
       // Check if the server returned a 404, 500, or other error

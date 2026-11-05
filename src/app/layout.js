@@ -24,9 +24,17 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/* Applies the theme (localStorage or system preference) before the
+            first paint, so there is no light-flash on dark-theme loads. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("theme");if(t?t==="dark":window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){document.documentElement.classList.add("dark")}}catch(e){}`,
+          }}
+        />
         <Navbar />
         {children}
         <footer className="bg-brand-footer">

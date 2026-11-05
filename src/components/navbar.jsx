@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,7 +9,9 @@ import {
   Home,
   LogOut,
   Settings,
-  User,
+  PlusCircle,
+  CalendarCog,
+  CalendarCheck2,
 } from "lucide-react";
 import { cn } from "cn";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,6 +25,8 @@ import { Separator } from "@/components/ui/separator";
 
 // Import your auth client instances
 import { authClient } from "@/lib/auth-client";
+import ThemeToggle from "@/components/theme-toggle";
+
 const { useSession, signOut } = authClient;
 
 export function Navbar() {
@@ -77,13 +82,7 @@ export function Navbar() {
             <Home className="size-4" strokeWidth={2.4} aria-hidden="true" />
             Events
           </Link>
-          <Link
-            href="/add-event"
-            className="flex items-center gap-2 rounded-lg bg-brand-dark px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark/90"
-          >
-            <Home className="size-4" strokeWidth={2.4} aria-hidden="true" />
-            Add Event
-          </Link>
+
           <Link
             href="/uc-events"
             className="flex items-center gap-2.5 text-sm font-semibold text-foreground transition-colors hover:text-brand"
@@ -96,6 +95,8 @@ export function Navbar() {
             Upcoming Events
           </Link>
         </nav>
+
+        <ThemeToggle />
 
         {user ? (
           <Popover>
@@ -124,14 +125,28 @@ export function Navbar() {
 
               <div className="flex flex-col space-y-1">
                 <Link
-                  href="/profile"
+                  href="/add-event"
                   className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
-                  <User className="size-4 text-muted-foreground" />
-                  Profile
+                  <PlusCircle className="size-4 text-muted-foreground" />
+                  Create Event
                 </Link>
                 <Link
-                  href="/profile/settings"
+                  href="/manage-events"
+                  className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  <CalendarCog className="size-4 text-muted-foreground" />
+                  Manage Events
+                </Link>
+                <Link
+                  href="/joined-events"
+                  className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  <CalendarCheck2 className="size-4 text-muted-foreground" />
+                  Joined Events
+                </Link>
+                <Link
+                  href="/settings"
                   className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
                   <Settings className="size-4 text-muted-foreground" />

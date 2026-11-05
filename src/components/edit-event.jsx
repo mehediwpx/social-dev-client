@@ -24,12 +24,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Edit, Megaphone } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { getAuthHeaders } from "@/lib/session";
+
+const { useSession } = authClient;
 
 const inputClasses =
   "mt-1.5 h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm";
 
 export default function EditEvent({ eventId, initialData, event }) {
-  console.log("EditEvent component received event:", event);
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+
   const [form, setForm] = useState({
     title: event?.title || "",
     description: event?.description || "",
@@ -46,6 +52,16 @@ export default function EditEvent({ eventId, initialData, event }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
+  // Only the creator gets the edit control (data-level guard is on the server).
+  // This early return must come after every hook.
+  if (
+    isPending ||
+    !user ||
+    (event.createdBy && event.createdBy !== user.email)
+  ) {
+    return null;
+  }
+
   // Single declaration for updating form state fields
   function setField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -60,10 +76,12 @@ export default function EditEvent({ eventId, initialData, event }) {
     const { _id, ...dataToUpdate } = form; // Exclude _id from the update payload
 
     try {
+      const authHeaders = await getAuthHeaders();
       const res = await fetch(`http://localhost:5000/events/${event._id}`, {
-        method: "PATCH", // or PATCH depending on your Express route
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          ...authHeaders,
         },
         body: JSON.stringify(dataToUpdate),
       });
@@ -99,15 +117,17 @@ export default function EditEvent({ eventId, initialData, event }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="h-12 px-6 border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl transition flex items-center justify-center gap-2"
-        >
-          <Edit className="w-4 h-4 text-slate-500" />
-          Edit Event
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button
+            variant="outline"
+            className="h-12 px-6 border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl transition flex items-center justify-center gap-2"
+          >
+            <Edit className="w-4 h-4 text-slate-500" />
+            Edit Event
+          </Button>
+        }
+      />
 
       <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -291,8 +311,8 @@ export default function EditEvent({ eventId, initialData, event }) {
         </form>
 
         <DialogFooter className="mt-4">
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+          <DialogClose render={<Button variant="outline" />}>
+            Cancel
           </DialogClose>
         </DialogFooter>
       </DialogContent>
