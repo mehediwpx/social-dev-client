@@ -18,6 +18,7 @@ const AllEventPage = async () => {
     const res = await fetch("http://localhost:5000/events", {
       cache: "no-store", // Ensures fresh data fetch on server request
     });
+    console.log("Response from server:", res);
     if (res.ok) {
       events = await res.json();
     }
